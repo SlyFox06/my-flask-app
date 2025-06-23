@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Research Paper Similarity Checker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="file"],
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px 0 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 12px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 30px;
+            background-color: #e7f4ea;
+            padding: 15px;
+            border-left: 5px solid #4caf50;
+            border-radius: 6px;
+        }
+
+        .result p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Research Paper Similarity Checker</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <label><strong>Upload Document:</strong></label>
+            <input type="file" name="document" required>
+
+            <label><strong>Enter Credit/Acknowledgment Text:</strong></label>
+            <input type="text" name="credit" placeholder="e.g., author name" required>
+
+            <label><strong>Topic to Search Papers For:</strong></label>
+            <input type="text" name="query" value="artificial intelligence">
+
+            <button type="submit">Check Similarity</button>
+        </form>
+
+        {% if similarity_score is not none %}
+        <div class="result">
+            <h2>Results</h2>
+            <p><strong>Similarity Score:</strong> {{ similarity_score }}%</p>
+            <p><strong>Credit Status:</strong> {{ credit_status }}</p>
+            <p><strong>Most Similar Paper:</strong> {{ match_title }}</p>
+            <p><strong>Authors:</strong> {{ match_authors }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
