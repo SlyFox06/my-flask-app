@@ -40,7 +40,7 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'user_files'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('paraphrase-MiniLM-L3-v2')
 
 # -----------------------
 # TEXT PREPROCESSING
