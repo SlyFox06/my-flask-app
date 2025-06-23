@@ -1,3 +1,7 @@
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+
 headers = {"Authorization": "Bearer RKSxqgz6mYarlWoUJkIPvE7NG3TtMLj5"}
 
 import os
