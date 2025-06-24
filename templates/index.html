@@ -5,97 +5,322 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Research Paper Similarity Checker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --success-color: #4caf50;
+            --danger-color: #f44336;
+            --warning-color: #ff9800;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --text-color: #2b2d42;
+            --text-light: #8d99ae;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f8;
-            color: #333;
-            padding: 20px;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 40px 20px;
         }
+
         .container {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 30px;
-            background-color: #ffffff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: white;
+            box-shadow: var(--shadow);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
         }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
         h1 {
             text-align: center;
-            font-size: 2.2rem;
-            color: #4caf50;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 15px;
         }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
+
         label {
             display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-color);
         }
+
         .form-control {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
         }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
         .file-upload {
-            border: 2px dashed #ccc;
-            padding: 20px;
+            border: 2px dashed #adb5bd;
+            padding: 30px;
             text-align: center;
             cursor: pointer;
             background-color: #f8f9fa;
+            border-radius: 8px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.05);
         }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
+
+        .file-upload i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        #fileUploadText {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #fileInfo {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
             cursor: pointer;
         }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
         .btn-primary {
-            background-color: #4caf50;
-            color: #fff;
+            background-color: var(--primary-color);
+            color: white;
         }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
         .btn-danger {
-            background-color: #f44336;
-            color: #fff;
+            background-color: var(--danger-color);
+            color: white;
         }
+
+        .btn-danger:hover {
+            background-color: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
         .alert {
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 5px solid transparent;
         }
+
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: rgba(76, 175, 80, 0.15);
+            color: #2e7d32;
+            border-left-color: var(--success-color);
         }
+
         .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: rgba(244, 67, 54, 0.15);
+            color: #c62828;
+            border-left-color: var(--danger-color);
         }
+
+        .result-card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .result-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .result-item strong {
+            min-width: 160px;
+            color: var(--text-light);
+        }
+
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             margin-top: 20px;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
         }
+
         th, td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
         }
+
         th {
-            background-color: #f4f4f4;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
         }
-        .result-card {
-            background-color: #f1f1f1;
-            padding: 20px;
-            border-radius: 6px;
-            margin-top: 20px;
+
+        tr:hover td {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .similarity-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .high-similarity {
+            background-color: rgba(244, 67, 54, 0.15);
+            color: var(--danger-color);
+        }
+
+        .medium-similarity {
+            background-color: rgba(255, 152, 0, 0.15);
+            color: var(--warning-color);
+        }
+
+        .low-similarity {
+            background-color: rgba(76, 175, 80, 0.15);
+            color: var(--success-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .result-item {
+                flex-direction: column;
+            }
+
+            .result-item strong {
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
@@ -150,22 +375,47 @@
         </form>
 
         {% if similarity_score is not none %}
-        <div class="result-card primary-result">
+        <div class="result-card">
             <h2><i class="fas fa-chart-line"></i> Results Summary</h2>
-            <div class="result-item"><strong>Similarity Score:</strong> {{ similarity_score }}%</div>
-            <div class="result-item"><strong>Credit Status:</strong> {{ credit_status }}</div>
+            <div class="result-item">
+                <strong>Similarity Score:</strong> 
+                <span class="similarity-badge 
+                    {% if similarity_score > 70 %}high-similarity
+                    {% elif similarity_score > 30 %}medium-similarity
+                    {% else %}low-similarity
+                    {% endif %}">
+                    {{ similarity_score }}%
+                </span>
+            </div>
+            <div class="result-item">
+                <strong>Credit Status:</strong> 
+                <span style="color: {% if credit_status == 'Given' %}var(--success-color){% else %}var(--danger-color){% endif %};">
+                    {{ credit_status }}
+                </span>
+            </div>
             {% if match_title %}
-                <div class="result-item"><strong>Most Similar Paper:</strong> {{ match_title }}</div>
-                <div class="result-item"><strong>Authors:</strong> {{ match_authors }}</div>
+                <div class="result-item">
+                    <strong>Most Similar Paper:</strong> 
+                    <span>{{ match_title }}</span>
+                </div>
+                <div class="result-item">
+                    <strong>Authors:</strong> 
+                    <span>{{ match_authors }}</span>
+                </div>
             {% endif %}
         </div>
 
         {% if matches %}
-        <div class="result-card matches-result">
-            <h3>Top Matching Papers</h3>
+        <div class="result-card">
+            <h3><i class="fas fa-file-alt"></i> Top Matching Papers</h3>
             <table>
                 <thead>
-                    <tr><th>Title</th><th>Authors</th><th>Source</th><th>Similarity</th></tr>
+                    <tr>
+                        <th>Title</th>
+                        <th>Authors</th>
+                        <th>Source</th>
+                        <th>Similarity</th>
+                    </tr>
                 </thead>
                 <tbody>
                     {% for match in matches %}
@@ -173,7 +423,15 @@
                         <td>{{ match.title }}</td>
                         <td>{{ match.authors }}</td>
                         <td>{{ match.source }}</td>
-                        <td>{{ match.score }}%</td>
+                        <td>
+                            <span class="similarity-badge 
+                                {% if match.score > 70 %}high-similarity
+                                {% elif match.score > 30 %}medium-similarity
+                                {% else %}low-similarity
+                                {% endif %}">
+                                {{ match.score }}%
+                            </span>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -198,6 +456,33 @@
         fileInput.addEventListener('change', function () {
             const file = this.files[0];
             if (file) {
+                fileUploadText.textContent = file.name;
+                fileInfo.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+        });
+
+        // Add drag and drop functionality
+        const fileUpload = document.querySelector('.file-upload');
+        
+        fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.style.borderColor = 'var(--primary-color)';
+            fileUpload.style.backgroundColor = 'rgba(67, 97, 238, 0.1)';
+        });
+
+        fileUpload.addEventListener('dragleave', () => {
+            fileUpload.style.borderColor = '#adb5bd';
+            fileUpload.style.backgroundColor = '#f8f9fa';
+        });
+
+        fileUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUpload.style.borderColor = '#adb5bd';
+            fileUpload.style.backgroundColor = '#f8f9fa';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                const file = e.dataTransfer.files[0];
                 fileUploadText.textContent = file.name;
                 fileInfo.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
             }
