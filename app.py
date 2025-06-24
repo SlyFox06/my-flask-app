@@ -2,7 +2,7 @@ import os
 import requests
 import nltk
 import logging
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect
 from sentence_transformers import SentenceTransformer, util
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -19,10 +19,10 @@ import time
 logging.basicConfig(filename='app.log', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load environment variables
+# Load .env variables
 load_dotenv()
 
-# Download required NLTK data
+# NLTK setup
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
 
@@ -30,11 +30,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key')
 
 # Rate limiting
-limiter = Limiter(
-    app=app,
-    key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"]
-)
+limiter = Limiter(app, key_func=get_remote_address, default_limits=["200/day", "50/hour"])
 
 # Caching
 cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache'})
@@ -42,17 +38,17 @@ cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache'})
 # Configuration
 UPLOAD_FOLDER = 'user_files'
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt', 'rtf'}
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
-# Load model
+# Load model and stopwords
 model = SentenceTransformer('paraphrase-MiniLM-L3-v2')
 STOPWORDS = set(stopwords.words('english'))
 
 # -----------------------
-# HELPER FUNCTIONS
+# Helper Functions
 # -----------------------
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -63,49 +59,48 @@ def preprocess(text):
         tokens = [word for word in tokens if word.isalnum() and word not in STOPWORDS]
         return ' '.join(tokens)
     except Exception as e:
-        logger.error(f"Error in preprocessing: {e}")
+        logger.error(f"Preprocessing error: {e}")
         return text.lower()
 
 def extract_text(file, filename):
     try:
         extension = filename.rsplit('.', 1)[1].lower()
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+        # Save file
         file.seek(0)
+        with open(file_path, 'wb') as f:
+            f.write(file.read())
 
         if extension == 'pdf':
-            temp_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            with open(temp_path, 'wb') as temp_pdf:
-                temp_pdf.write(file.read())
-            doc = fitz.open(temp_path)
+            doc = fitz.open(file_path)
             text = ''
             for page in doc:
                 text += page.get_text()
             doc.close()
-            os.remove(temp_path)
+            os.remove(file_path)
             return text
 
         elif extension == 'docx':
-            try:
-                doc = Document(file)
-                return '\n'.join([para.text for para in doc.paragraphs if para.text])
-            except Exception as e:
-                logger.error(f"DOCX extraction failed: {e}")
-                return ""
+            doc = Document(file_path)
+            text = '\n'.join([p.text for p in doc.paragraphs if p.text])
+            os.remove(file_path)
+            return text
 
         elif extension in ['txt', 'rtf']:
-            try:
-                return file.read().decode('utf-8', errors='replace')
-            except Exception as e:
-                logger.error(f"TXT/RTF extraction failed: {e}")
-                return ""
+            with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
+                text = f.read()
+            os.remove(file_path)
+            return text
 
-        logger.warning(f"Unsupported file extension: {extension}")
+        logger.warning("Unsupported file extension.")
         return ""
     except Exception as e:
-        logger.error(f"Error extracting text from {filename}: {e}")
+        logger.error(f"Error extracting text: {e}")
         return ""
 
 # -----------------------
-# API FETCHERS WITH CACHING
+# API Functions
 # -----------------------
 @cache.memoize(timeout=3600)
 def fetch_core_papers(query):
@@ -125,7 +120,7 @@ def fetch_core_papers(query):
                 })
         return papers
     except Exception as e:
-        logger.error(f"Error fetching CORE papers: {e}")
+        logger.error(f"CORE fetch error: {e}")
         return []
 
 @cache.memoize(timeout=3600)
@@ -145,14 +140,14 @@ def fetch_semantic_papers(query):
                 })
         return papers
     except Exception as e:
-        logger.error(f"Error fetching Semantic Scholar papers: {e}")
+        logger.error(f"Semantic Scholar fetch error: {e}")
         return []
 
 # -----------------------
-# MAIN ROUTES
+# Main Route
 # -----------------------
 @app.route('/', methods=['GET', 'POST'])
-@limiter.limit("10 per minute")
+@limiter.limit("10/minute")
 def index():
     if request.method == 'POST':
         if 'document' not in request.files:
@@ -165,70 +160,69 @@ def index():
             return redirect(request.url)
 
         if not allowed_file(uploaded_file.filename):
-            flash('Invalid file type. Allowed: PDF, DOCX, TXT, RTF', 'error')
+            flash('Unsupported file type.', 'error')
             return redirect(request.url)
 
         try:
-            # Check file size
-            file_size = request.content_length
-            if file_size > MAX_FILE_SIZE:
-                flash(f'File too large. Maximum size is {MAX_FILE_SIZE//(1024*1024)}MB', 'error')
+            if request.content_length > MAX_FILE_SIZE:
+                flash(f'File too large (max {MAX_FILE_SIZE//(1024*1024)}MB)', 'error')
                 return redirect(request.url)
 
-            credit_info = request.form['credit'].lower()
+            credit_input = request.form.get('credit', '').lower()
             query = request.form.get('query', 'artificial intelligence')
             filename = secure_filename(uploaded_file.filename)
 
-            with uploaded_file.stream as file_stream:
-                user_text = extract_text(file_stream, filename)
+            extracted_text = extract_text(uploaded_file, filename)
 
-            if not user_text.strip():
-                flash('Could not extract text. The file may be empty, corrupted, or in an unsupported format.', 'error')
+            if not extracted_text.strip():
+                flash("Could not extract text from file.", "error")
                 return redirect(request.url)
 
-            time.sleep(1)  # Simulate processing
-            user_text_clean = preprocess(user_text)
-            user_embedding = model.encode(user_text_clean, convert_to_tensor=True)
+            # Process
+            time.sleep(1)
+            cleaned_text = preprocess(extracted_text)
+            user_embed = model.encode(cleaned_text, convert_to_tensor=True)
 
-            all_papers = fetch_core_papers(query) + fetch_semantic_papers(query)
+            papers = fetch_core_papers(query) + fetch_semantic_papers(query)
 
             best_score = 0
             best_match = None
-            matches = []
+            results = []
 
-            for paper in all_papers:
+            for paper in papers:
                 if paper['abstract']:
-                    paper_text = preprocess(paper['abstract'])
-                    paper_embedding = model.encode(paper_text, convert_to_tensor=True)
-                    score = util.cos_sim(user_embedding, paper_embedding).item()
-                    matches.append({
+                    paper_clean = preprocess(paper['abstract'])
+                    paper_embed = model.encode(paper_clean, convert_to_tensor=True)
+                    score = util.cos_sim(user_embed, paper_embed).item()
+                    results.append({
                         'title': paper['title'],
                         'authors': ', '.join(paper['authors']),
-                        'source': paper.get('source', 'Unknown'),
+                        'source': paper['source'],
                         'score': round(score * 100, 2)
                     })
                     if score > best_score:
                         best_score = score
                         best_match = paper
 
-            similarity_score = round(best_score * 100, 2) if best_score > 0 else 0
-            credit_status = 'Given' if credit_info in user_text.lower() else 'Not Given'
+            similarity = round(best_score * 100, 2)
+            credit_status = 'Given' if credit_input in extracted_text.lower() else 'Not Given'
 
             return render_template('index.html',
-                                   similarity_score=similarity_score,
+                                   similarity_score=similarity,
                                    credit_status=credit_status,
                                    match_title=best_match['title'] if best_match else '',
                                    match_authors=', '.join(best_match['authors']) if best_match else '',
-                                   matches=matches[:5],
+                                   matches=results[:5],
                                    query=query,
-                                   credit_info=credit_info)
+                                   credit_info=credit_input)
 
         except Exception as e:
-            logger.error(f"Processing error: {str(e)}", exc_info=True)
-            flash(f'An error occurred during processing: {str(e)}', 'error')
+            logger.error(f"Processing error: {e}")
+            flash(f"An error occurred: {e}", "error")
             return redirect(request.url)
 
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
