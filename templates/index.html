@@ -1,37 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Research Paper Similarity Checker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #4caf50;
-            --primary-dark: #45a049;
-            --danger: #f44336;
-            --danger-dark: #d32f2f;
-            --info: #2196F3;
-            --warning: #ff9800;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --gray: #6c757d;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
             background-color: #f4f6f8;
             color: #333;
             padding: 20px;
         }
-        
         .container {
             max-width: 900px;
             margin: 30px auto;
@@ -40,262 +20,89 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
-        
-        h1, h2, h3 {
-            color: var(--dark);
-            margin-bottom: 20px;
-        }
-        
         h1 {
             text-align: center;
             font-size: 2.2rem;
-            color: var(--primary);
+            color: #4caf50;
         }
-        
-        h2 {
-            font-size: 1.8rem;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 10px;
-        }
-        
-        h3 {
-            font-size: 1.4rem;
-            color: var(--info);
-        }
-        
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
-        
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
+            font-weight: bold;
+            margin-bottom: 5px;
         }
-        
         .form-control {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
-        
-        .form-control:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25);
-        }
-        
         .file-upload {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px;
-            border: 2px dashed #ced4da;
-            border-radius: 6px;
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
             background-color: #f8f9fa;
-            cursor: pointer;
-            transition: all 0.3s;
         }
-        
-        .file-upload:hover {
-            border-color: var(--primary);
-            background-color: rgba(76, 175, 80, 0.05);
-        }
-        
-        .file-upload i {
-            font-size: 48px;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-        
-        .file-upload input[type="file"] {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-        
-        .file-info {
-            margin-top: 10px;
-            font-size: 14px;
-            color: var(--gray);
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn i {
-            margin-right: 8px;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: var(--danger-dark);
-        }
-        
         .btn-group {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             margin-top: 20px;
         }
-        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #4caf50;
+            color: #fff;
+        }
+        .btn-danger {
+            background-color: #f44336;
+            color: #fff;
+        }
         .alert {
             padding: 15px;
+            border-radius: 4px;
             margin-bottom: 20px;
-            border-radius: 6px;
-            font-weight: 500;
         }
-        
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 5px solid var(--danger);
-        }
-        
         .alert-success {
             background-color: #d4edda;
             color: #155724;
-            border-left: 5px solid var(--primary);
         }
-        
-        .progress-container {
-            display: none;
-            margin: 30px 0;
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
         }
-        
-        .progress-text {
-            margin-bottom: 10px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-        
-        .progress-bar {
-            height: 20px;
-            background-color: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .progress {
-            height: 100%;
-            background-color: var(--primary);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        
-        .result-card {
-            margin: 30px 0;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .primary-result {
-            background-color: #e8f5e9;
-            border-left: 5px solid var(--primary);
-        }
-        
-        .matches-result {
-            background-color: #e3f2fd;
-            border-left: 5px solid var(--info);
-        }
-        
-        .result-item {
-            margin-bottom: 15px;
-        }
-        
-        .result-label {
-            font-weight: 600;
-            color: var(--dark);
-        }
-        
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        
         th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #dee2e6;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
         }
-        
         th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: var(--dark);
+            background-color: #f4f4f4;
         }
-        
-        tr:hover {
-            background-color: rgba(0, 0, 0, 0.02);
-        }
-        
-        .score-cell {
-            font-weight: 600;
-        }
-        
-        .score-high {
-            color: var(--primary);
-        }
-        
-        .score-medium {
-            color: var(--warning);
-        }
-        
-        .score-low {
-            color: var(--danger);
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            table {
-                display: block;
-                overflow-x: auto;
-            }
+        .result-card {
+            background-color: #f1f1f1;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1><i class="fas fa-search"></i> Research Paper Similarity Checker</h1>
-        
+
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -316,13 +123,12 @@
                     <span class="file-info" id="fileInfo"></span>
                     <input type="file" name="document" id="document" required accept=".pdf,.docx,.txt,.rtf">
                 </div>
-                <small class="form-text text-muted">Supported formats: PDF, DOCX, TXT, RTF (Max 10MB)</small>
             </div>
 
             <div class="form-group">
                 <label for="credit"><i class="fas fa-user-tag"></i> Credit/Acknowledgment Text</label>
                 <input type="text" class="form-control" name="credit" id="credit" 
-                       placeholder="e.g., author name or citation" required 
+                       placeholder="e.g., author name or citation" 
                        value="{{ credit_info if credit_info }}">
             </div>
 
@@ -343,73 +149,31 @@
             </div>
         </form>
 
-        <div class="progress-container" id="progressContainer">
-            <p class="progress-text" id="progressText">Processing your document...</p>
-            <div class="progress-bar">
-                <div class="progress" id="progressBar"></div>
-            </div>
-        </div>
-
         {% if similarity_score is not none %}
         <div class="result-card primary-result">
             <h2><i class="fas fa-chart-line"></i> Results Summary</h2>
-            
-            <div class="result-item">
-                <span class="result-label">Similarity Score:</span>
-                <span class="score-high">{{ similarity_score }}%</span>
-            </div>
-            
-            <div class="result-item">
-                <span class="result-label">Credit Status:</span>
-                <span class="{{ 'text-success' if credit_status == 'Given' else 'text-danger' }}">
-                    <i class="fas fa-{{ 'check-circle' if credit_status == 'Given' else 'times-circle' }}"></i>
-                    {{ credit_status }}
-                </span>
-            </div>
-            
+            <div class="result-item"><strong>Similarity Score:</strong> {{ similarity_score }}%</div>
+            <div class="result-item"><strong>Credit Status:</strong> {{ credit_status }}</div>
             {% if match_title %}
-            <div class="result-item">
-                <span class="result-label">Most Similar Paper:</span>
-                <span>{{ match_title }}</span>
-            </div>
-            
-            <div class="result-item">
-                <span class="result-label">Authors:</span>
-                <span>{{ match_authors }}</span>
-            </div>
+                <div class="result-item"><strong>Most Similar Paper:</strong> {{ match_title }}</div>
+                <div class="result-item"><strong>Authors:</strong> {{ match_authors }}</div>
             {% endif %}
         </div>
 
         {% if matches %}
         <div class="result-card matches-result">
-            <h3><i class="fas fa-list-ol"></i> Top Matching Papers</h3>
-            
+            <h3>Top Matching Papers</h3>
             <table>
                 <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Authors</th>
-                        <th>Source</th>
-                        <th>Similarity</th>
-                    </tr>
+                    <tr><th>Title</th><th>Authors</th><th>Source</th><th>Similarity</th></tr>
                 </thead>
                 <tbody>
                     {% for match in matches %}
                     <tr>
                         <td>{{ match.title }}</td>
                         <td>{{ match.authors }}</td>
-                        <td>
-                            <span class="badge {{ 'badge-primary' if match.source == 'CORE' else 'badge-info' }}">
-                                {{ match.source }}
-                            </span>
-                        </td>
-                        <td class="score-cell 
-                            {% if match.score > 70 %}score-high
-                            {% elif match.score > 40 %}score-medium
-                            {% else %}score-low
-                            {% endif %}">
-                            {{ match.score }}%
-                        </td>
+                        <td>{{ match.source }}</td>
+                        <td>{{ match.score }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -420,97 +184,24 @@
     </div>
 
     <script>
-        // File upload handling
-        const fileInput = document.getElementById('document');
-        const fileInfo = document.getElementById('fileInfo');
-        const fileUploadText = document.getElementById('fileUploadText');
-        
-        fileInput.addEventListener('change', function(e) {
-            if (this.files.length > 0) {
-                const file = this.files[0];
-                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-                
-                fileUploadText.textContent = file.name;
-                fileInfo.textContent = `${fileSize} MB • ${file.type || 'Unknown type'}`;
-            }
-        });
-        
-        // Drag and drop functionality
-        const uploadArea = document.querySelector('.file-upload');
-        
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#4caf50';
-            uploadArea.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
-        });
-        
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.borderColor = '#ced4da';
-            uploadArea.style.backgroundColor = '#f8f9fa';
-        });
-        
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#ced4da';
-            uploadArea.style.backgroundColor = '#f8f9fa';
-            
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                const event = new Event('change');
-                fileInput.dispatchEvent(event);
-            }
-        });
-        
-        // Form submission handling
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
-            const file = fileInput.files[0];
-            
-            if (file) {
-                // Validate file type
-                const ext = file.name.split('.').pop().toLowerCase();
-                if (!['pdf', 'docx', 'txt', 'rtf'].includes(ext)) {
-                    alert('Please upload only PDF, DOCX, TXT, or RTF files.');
-                    e.preventDefault();
-                    return false;
-                }
-                
-                // Validate file size
-                if (file.size > 10 * 1024 * 1024) {
-                    alert('File size too large. Maximum 10MB allowed.');
-                    e.preventDefault();
-                    return false;
-                }
-                
-                // Show progress
-                const progressContainer = document.getElementById('progressContainer');
-                const progressBar = document.getElementById('progressBar');
-                const progressText = document.getElementById('progressText');
-                const submitBtn = document.getElementById('submitBtn');
-                
-                progressContainer.style.display = 'block';
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                
-                // Simulate progress
-                let width = 0;
-                const interval = setInterval(() => {
-                    if (width >= 90) {
-                        clearInterval(interval);
-                        progressText.textContent = 'Finalizing results...';
-                    } else {
-                        width += 10;
-                        progressBar.style.width = width + '%';
-                    }
-                }, 300);
-            }
-        });
-        
-        // Clear form function
         function clearForm() {
-            document.getElementById('uploadForm').reset();
-            fileUploadText.textContent = 'Click to browse or drag & drop files here';
-            fileInfo.textContent = '';
+            const form = document.getElementById('uploadForm');
+            form.reset();
+            document.getElementById('fileUploadText').textContent = 'Click to browse or drag & drop files here';
+            document.getElementById('fileInfo').textContent = '';
         }
+
+        const fileInput = document.getElementById('document');
+        const fileUploadText = document.getElementById('fileUploadText');
+        const fileInfo = document.getElementById('fileInfo');
+
+        fileInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                fileUploadText.textContent = file.name;
+                fileInfo.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+        });
     </script>
 </body>
 </html>

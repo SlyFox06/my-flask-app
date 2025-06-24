@@ -14,6 +14,8 @@ from flask_limiter.util import get_remote_address
 from flask_caching import Cache
 from dotenv import load_dotenv
 import time
+import io
+import uuid
 
 # Initialize logging
 logging.basicConfig(filename='app.log', level=logging.INFO)
@@ -30,9 +32,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key')
 
 # Rate limiting
-limiter = Limiter(key_func=get_remote_address, default_limits=["200/day", "50/hour"])
-limiter.init_app(app)
-
+limiter = Limiter(get_remote_address, app=app, default_limits=["200/day", "50/hour"])
 
 # Caching
 cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache'})
@@ -49,11 +49,10 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 model = SentenceTransformer('paraphrase-MiniLM-L3-v2')
 STOPWORDS = set(stopwords.words('english'))
 
-# -----------------------
-# Helper Functions
-# -----------------------
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def preprocess(text):
     try:
@@ -64,43 +63,33 @@ def preprocess(text):
         logger.error(f"Preprocessing error: {e}")
         return text.lower()
 
-def extract_text(file, filename):
+
+def extract_text(file_stream, filename):
     try:
         extension = filename.rsplit('.', 1)[1].lower()
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{uuid.uuid4().hex}_{filename}")
 
-        # Save file
-        file.seek(0)
-        with open(file_path, 'wb') as f:
-            f.write(file.read())
+        with open(temp_path, 'wb') as f:
+            f.write(file_stream.read())
 
+        text = ""
         if extension == 'pdf':
-            with pdfplumber.open(file_path) as pdf:
+            with pdfplumber.open(temp_path) as pdf:
                 text = '\n'.join(page.extract_text() or '' for page in pdf.pages)
-            os.remove(file_path)
-            return text
-
         elif extension == 'docx':
-            doc = Document(file_path)
+            doc = Document(temp_path)
             text = '\n'.join([p.text for p in doc.paragraphs if p.text])
-            os.remove(file_path)
-            return text
-
         elif extension in ['txt', 'rtf']:
-            with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
+            with open(temp_path, 'r', encoding='utf-8', errors='replace') as f:
                 text = f.read()
-            os.remove(file_path)
-            return text
 
-        logger.warning("Unsupported file extension.")
-        return ""
+        os.remove(temp_path)
+        return text
     except Exception as e:
         logger.error(f"Error extracting text: {e}")
         return ""
 
-# -----------------------
-# API Functions
-# -----------------------
+
 @cache.memoize(timeout=3600)
 def fetch_core_papers(query):
     try:
@@ -122,6 +111,7 @@ def fetch_core_papers(query):
         logger.error(f"CORE fetch error: {e}")
         return []
 
+
 @cache.memoize(timeout=3600)
 def fetch_semantic_papers(query):
     try:
@@ -142,12 +132,12 @@ def fetch_semantic_papers(query):
         logger.error(f"Semantic Scholar fetch error: {e}")
         return []
 
-# -----------------------
-# Main Route
-# -----------------------
+
 @app.route('/', methods=['GET', 'POST'])
 @limiter.limit("10/minute")
 def index():
+    cache.clear()  # Ensure no cache from previous request
+
     if request.method == 'POST':
         if 'document' not in request.files:
             flash('No file selected', 'error')
@@ -171,13 +161,12 @@ def index():
             query = request.form.get('query', 'artificial intelligence')
             filename = secure_filename(uploaded_file.filename)
 
-            extracted_text = extract_text(uploaded_file, filename)
+            extracted_text = extract_text(uploaded_file.stream, filename)
 
             if not extracted_text.strip():
                 flash("Could not extract text from file.", "error")
                 return redirect(request.url)
 
-            # Process
             time.sleep(1)
             cleaned_text = preprocess(extracted_text)
             user_embed = model.encode(cleaned_text, convert_to_tensor=True)
@@ -222,7 +211,7 @@ def index():
 
     return render_template('index.html')
 
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
-
