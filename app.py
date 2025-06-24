@@ -30,7 +30,11 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key')
 
 # Rate limiting
-limiter = Limiter(get_remote_address, app=app, default_limits=["200/day", "50/hour"])
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200/day", "50/hour"]
+)
+limiter.init_app(app)
 
 # Caching
 cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache'})
