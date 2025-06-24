@@ -1,0 +1,55 @@
+INFO:sentence_transformers.SentenceTransformer:Use pytorch device_name: cpu
+INFO:sentence_transformers.SentenceTransformer:Load pretrained SentenceTransformer: paraphrase-MiniLM-L3-v2
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:sentence_transformers.SentenceTransformer:Use pytorch device_name: cpu
+INFO:sentence_transformers.SentenceTransformer:Load pretrained SentenceTransformer: paraphrase-MiniLM-L3-v2
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:24:27] "GET / HTTP/1.1" 200 -
+INFO:__main__:Extracting text from N19-1423.pdf
+ERROR:__main__:Extraction error for N19-1423.pdf: expected str, bytes or os.PathLike object, not BufferedReader
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:24:42] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:24:42] "GET / HTTP/1.1" 200 -
+INFO:__main__:Extracting text from N19-1423.pdf
+ERROR:__main__:Extraction error for N19-1423.pdf: expected str, bytes or os.PathLike object, not BufferedReader
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:25:15] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:25:15] "GET / HTTP/1.1" 200 -
+INFO:sentence_transformers.SentenceTransformer:Use pytorch device_name: cpu
+INFO:sentence_transformers.SentenceTransformer:Load pretrained SentenceTransformer: paraphrase-MiniLM-L3-v2
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:27:42] "GET / HTTP/1.1" 200 -
+WARNING:__main__:Textract failed, trying specific extractors: The command `pdftotext user_files\temp_N19-1423.pdf -` failed with exit code 127
+------------- stdout -------------
+------------- stderr -------------
+
+ERROR:__main__:PDF extraction failed: expected str, bytes or os.PathLike object, not BufferedReader
+ERROR:__main__:All extraction methods failed
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:27:53] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:27:53] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:28:41] "GET / HTTP/1.1" 200 -
+WARNING:__main__:Textract failed, trying specific extractors: The command `pdftotext user_files\temp_kk.pdf -` failed with exit code 127
+------------- stdout -------------
+------------- stderr -------------
+
+ERROR:__main__:PDF extraction failed: expected str, bytes or os.PathLike object, not BufferedReader
+ERROR:__main__:All extraction methods failed
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:28:53] "[32mPOST / HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 12:28:53] "GET / HTTP/1.1" 200 -
+INFO:sentence_transformers.SentenceTransformer:Use pytorch device_name: cpu
+INFO:sentence_transformers.SentenceTransformer:Load pretrained SentenceTransformer: paraphrase-MiniLM-L3-v2
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 13:27:22] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 13:27:36] "POST / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 13:28:29] "POST / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 13:29:00] "POST / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 13:29:35] "POST / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 13:31:37] "POST / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 13:31:51] "POST / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [24/Jun/2025 13:32:58] "POST / HTTP/1.1" 200 -

@@ -1,94 +1,516 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Research Paper Similarity Checker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f8;
+        :root {
+            --primary: #4caf50;
+            --primary-dark: #45a049;
+            --danger: #f44336;
+            --danger-dark: #d32f2f;
+            --info: #2196F3;
+            --warning: #ff9800;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+        }
+        
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f6f8;
+            color: #333;
+            padding: 20px;
+        }
+        
         .container {
-            max-width: 600px;
-            margin: 50px auto;
+            max-width: 900px;
+            margin: 30px auto;
             padding: 30px;
             background-color: #ffffff;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
-
-        h1, h2 {
-            text-align: center;
-            color: #333;
+        
+        h1, h2, h3 {
+            color: var(--dark);
+            margin-bottom: 20px;
         }
-
-        form {
+        
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            color: var(--primary);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            color: var(--info);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25);
+        }
+        
+        .file-upload {
+            position: relative;
             display: flex;
             flex-direction: column;
-        }
-
-        input[type="file"],
-        input[type="text"] {
-            padding: 10px;
-            margin: 10px 0 20px;
-            border: 1px solid #ccc;
+            align-items: center;
+            padding: 30px;
+            border: 2px dashed #ced4da;
             border-radius: 6px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-
-        button {
-            padding: 12px;
-            background-color: #4caf50;
-            color: white;
+        
+        .file-upload:hover {
+            border-color: var(--primary);
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .file-upload i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .file-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            transition: all 0.3s;
         }
-
-        button:hover {
-            background-color: #45a049;
+        
+        .btn i {
+            margin-right: 8px;
         }
-
-        .result {
-            margin-top: 30px;
-            background-color: #e7f4ea;
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--danger-dark);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .alert {
             padding: 15px;
-            border-left: 5px solid #4caf50;
+            margin-bottom: 20px;
             border-radius: 6px;
+            font-weight: 500;
         }
-
-        .result p {
-            margin: 10px 0;
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid var(--danger);
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 5px solid var(--primary);
+        }
+        
+        .progress-container {
+            display: none;
+            margin: 30px 0;
+        }
+        
+        .progress-text {
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .result-card {
+            margin: 30px 0;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .primary-result {
+            background-color: #e8f5e9;
+            border-left: 5px solid var(--primary);
+        }
+        
+        .matches-result {
+            background-color: #e3f2fd;
+            border-left: 5px solid var(--info);
+        }
+        
+        .result-item {
+            margin-bottom: 15px;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .score-cell {
+            font-weight: 600;
+        }
+        
+        .score-high {
+            color: var(--primary);
+        }
+        
+        .score-medium {
+            color: var(--warning);
+        }
+        
+        .score-low {
+            color: var(--danger);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Research Paper Similarity Checker</h1>
-        <form method="POST" enctype="multipart/form-data">
-            <label><strong>Upload Document:</strong></label>
-            <input type="file" name="document" required>
+        <h1><i class="fas fa-search"></i> Research Paper Similarity Checker</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-            <label><strong>Enter Credit/Acknowledgment Text:</strong></label>
-            <input type="text" name="credit" placeholder="e.g., author name" required>
+        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            <div class="form-group">
+                <label for="document"><i class="fas fa-file-upload"></i> Upload Document</label>
+                <div class="file-upload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span id="fileUploadText">Click to browse or drag & drop files here</span>
+                    <span class="file-info" id="fileInfo"></span>
+                    <input type="file" name="document" id="document" required accept=".pdf,.docx,.txt,.rtf">
+                </div>
+                <small class="form-text text-muted">Supported formats: PDF, DOCX, TXT, RTF (Max 10MB)</small>
+            </div>
 
-            <label><strong>Topic to Search Papers For:</strong></label>
-            <input type="text" name="query" value="artificial intelligence">
+            <div class="form-group">
+                <label for="credit"><i class="fas fa-user-tag"></i> Credit/Acknowledgment Text</label>
+                <input type="text" class="form-control" name="credit" id="credit" 
+                       placeholder="e.g., author name or citation" required 
+                       value="{{ credit_info if credit_info }}">
+            </div>
 
-            <button type="submit">Check Similarity</button>
+            <div class="form-group">
+                <label for="query"><i class="fas fa-search"></i> Research Topic</label>
+                <input type="text" class="form-control" name="query" id="query" 
+                       placeholder="Enter topic to search papers for" 
+                       value="{{ query if query else 'artificial intelligence' }}">
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="fas fa-search"></i> Check Similarity
+                </button>
+                <button type="button" class="btn btn-danger" onclick="clearForm()">
+                    <i class="fas fa-trash-alt"></i> Clear Form
+                </button>
+            </div>
         </form>
 
+        <div class="progress-container" id="progressContainer">
+            <p class="progress-text" id="progressText">Processing your document...</p>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+        </div>
+
         {% if similarity_score is not none %}
-        <div class="result">
-            <h2>Results</h2>
-            <p><strong>Similarity Score:</strong> {{ similarity_score }}%</p>
-            <p><strong>Credit Status:</strong> {{ credit_status }}</p>
-            <p><strong>Most Similar Paper:</strong> {{ match_title }}</p>
-            <p><strong>Authors:</strong> {{ match_authors }}</p>
+        <div class="result-card primary-result">
+            <h2><i class="fas fa-chart-line"></i> Results Summary</h2>
+            
+            <div class="result-item">
+                <span class="result-label">Similarity Score:</span>
+                <span class="score-high">{{ similarity_score }}%</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Credit Status:</span>
+                <span class="{{ 'text-success' if credit_status == 'Given' else 'text-danger' }}">
+                    <i class="fas fa-{{ 'check-circle' if credit_status == 'Given' else 'times-circle' }}"></i>
+                    {{ credit_status }}
+                </span>
+            </div>
+            
+            {% if match_title %}
+            <div class="result-item">
+                <span class="result-label">Most Similar Paper:</span>
+                <span>{{ match_title }}</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Authors:</span>
+                <span>{{ match_authors }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if matches %}
+        <div class="result-card matches-result">
+            <h3><i class="fas fa-list-ol"></i> Top Matching Papers</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Authors</th>
+                        <th>Source</th>
+                        <th>Similarity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in matches %}
+                    <tr>
+                        <td>{{ match.title }}</td>
+                        <td>{{ match.authors }}</td>
+                        <td>
+                            <span class="badge {{ 'badge-primary' if match.source == 'CORE' else 'badge-info' }}">
+                                {{ match.source }}
+                            </span>
+                        </td>
+                        <td class="score-cell 
+                            {% if match.score > 70 %}score-high
+                            {% elif match.score > 40 %}score-medium
+                            {% else %}score-low
+                            {% endif %}">
+                            {{ match.score }}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
         {% endif %}
+        {% endif %}
     </div>
+
+    <script>
+        // File upload handling
+        const fileInput = document.getElementById('document');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileUploadText = document.getElementById('fileUploadText');
+        
+        fileInput.addEventListener('change', function(e) {
+            if (this.files.length > 0) {
+                const file = this.files[0];
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                
+                fileUploadText.textContent = file.name;
+                fileInfo.textContent = `${fileSize} MB • ${file.type || 'Unknown type'}`;
+            }
+        });
+        
+        // Drag and drop functionality
+        const uploadArea = document.querySelector('.file-upload');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#4caf50';
+            uploadArea.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ced4da';
+            uploadArea.style.backgroundColor = '#f8f9fa';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ced4da';
+            uploadArea.style.backgroundColor = '#f8f9fa';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
+        
+        // Form submission handling
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            const file = fileInput.files[0];
+            
+            if (file) {
+                // Validate file type
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (!['pdf', 'docx', 'txt', 'rtf'].includes(ext)) {
+                    alert('Please upload only PDF, DOCX, TXT, or RTF files.');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Validate file size
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size too large. Maximum 10MB allowed.');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Show progress
+                const progressContainer = document.getElementById('progressContainer');
+                const progressBar = document.getElementById('progressBar');
+                const progressText = document.getElementById('progressText');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                progressContainer.style.display = 'block';
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                // Simulate progress
+                let width = 0;
+                const interval = setInterval(() => {
+                    if (width >= 90) {
+                        clearInterval(interval);
+                        progressText.textContent = 'Finalizing results...';
+                    } else {
+                        width += 10;
+                        progressBar.style.width = width + '%';
+                    }
+                }, 300);
+            }
+        });
+        
+        // Clear form function
+        function clearForm() {
+            document.getElementById('uploadForm').reset();
+            fileUploadText.textContent = 'Click to browse or drag & drop files here';
+            fileInfo.textContent = '';
+        }
+    </script>
 </body>
 </html>
