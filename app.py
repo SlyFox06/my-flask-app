@@ -204,9 +204,16 @@ def index():
             flash(f"An error occurred: {e}", "error")
             return redirect(request.url)
 
-    return render_template('index.html')
+    # This part fixes the UndefinedError when accessing the page via GET
+    return render_template('index.html',
+                           similarity_score=None,
+                           credit_status=None,
+                           match_title=None,
+                           match_authors=None,
+                           matches=[],
+                           query='',
+                           credit_info='')
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
-
