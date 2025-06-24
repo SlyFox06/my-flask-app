@@ -8,7 +8,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from werkzeug.utils import secure_filename
 from docx import Document
-import fitz  # PyMuPDF
+import pdfplumber
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_caching import Cache
@@ -75,11 +75,8 @@ def extract_text(file, filename):
             f.write(file.read())
 
         if extension == 'pdf':
-            doc = fitz.open(file_path)
-            text = ''
-            for page in doc:
-                text += page.get_text()
-            doc.close()
+            with pdfplumber.open(file_path) as pdf:
+                text = '\n'.join(page.extract_text() or '' for page in pdf.pages)
             os.remove(file_path)
             return text
 
@@ -228,3 +225,4 @@ def index():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
+
